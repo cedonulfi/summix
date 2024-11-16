@@ -24,7 +24,7 @@
 
 ### 1. Clone the repository  
 ```bash  
-git clone https://github.com/yourusername/summix.git  
+git clone https://github.com/cedonulfi/summix.git  
 cd summix  
 ```
 

@@ -1,5 +1,5 @@
 import os
-import requests
+import google.generativeai as genai
 import mysql.connector
 from bs4 import BeautifulSoup
 from urllib.parse import urljoin
@@ -12,32 +12,18 @@ DB_CONFIG = {
     "database": "summix"
 }
 
-# Gemini AI API key
-API_KEY = "YOUR_API_KEY"
+# Configure Gemini AI SDK
+genai.configure(api_key=os.environ["API_KEY"])
 
-# Function to perform a request to the Gemini API
+# Function to summarize text using Gemini AI
 def summarize_text(text):
-    url = "https://api.openai.com/v1/chat/completions"  # Replace with the correct Gemini API URL
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {API_KEY}"
-    }
-    data = {
-        "model": "gemini",  # Replace with the desired Gemini model
-        "messages": [
-            {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": f"Summarize this text: {text}"}
-        ],
-        "max_tokens": 100  # Adjust the maximum token limit for the summary
-    }
-
-    response = requests.post(url, headers=headers, json=data)
-    response_json = response.json()
-
-    if response_json.get("choices"):
-        return response_json["choices"][0]["message"]["content"]
-    else:
-        return "An error occurred while summarizing the text."
+    try:
+        model = genai.GenerativeModel("gemini-1.5-flash")  # Specify the model
+        response = model.generate_content(f"Summarize this news article: {text}")
+        return response.text  # Extract the summary text from the response
+    except Exception as e:
+        print(f"Error summarizing text: {e}")
+        return "Failed to generate summary."
 
 # Function to connect to the database
 def connect_to_database():
